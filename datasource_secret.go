@@ -9,6 +9,12 @@ import (
 	"github.com/thycotic/dsv-sdk-go/vault"
 )
 
+func setResourceDataAttributes(secret *vault.Secret, d *schema.ResourceData) {
+	d.Set("description", secret.Description)
+	d.Set("attributes", secret.Attributes)
+	d.Set("version", secret.Version)
+}
+
 func dataSourceSecretRead(d *schema.ResourceData, meta interface{}) error {
 	path := d.Get("path").(string)
 	dsv, err := vault.New(meta.(vault.Configuration))
@@ -27,6 +33,7 @@ func dataSourceSecretRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	d.SetId(secret.ID)
+	setResourceDataAttributes(secret, d)
 
 	// if element is defined, extract it from the secrets data map and return it
 	if element := d.Get("element").(string); element != "" {
@@ -41,7 +48,7 @@ func dataSourceSecretRead(d *schema.ResourceData, meta interface{}) error {
 	data, _ := json.Marshal(secret.Data)
 
 	// just marshal the whole thing back into JSON and return that
-	d.Set("contents", data)
+	d.Set("contents", string(data))
 	log.Printf("[DEBUG] returning .data as the secret")
 	return nil
 }
@@ -65,6 +72,16 @@ func dataSourceSecret() *schema.Resource {
 			"id": {
 				Computed:    true,
 				Description: "the (UUID) identifier of the secret",
+				Type:        schema.TypeString,
+			},
+			"attributes": {
+				Computed:    true,
+				Description: "the attributes of the secret",
+				Type:        schema.TypeMap,
+			},
+			"description": {
+				Computed:    true,
+				Description: "the description of the secret",
 				Type:        schema.TypeString,
 			},
 			"path": {
