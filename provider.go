@@ -40,6 +40,7 @@ func Provider() *schema.Provider {
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"dsv_client": resourceClient(),
+			"dsv_secret": resourceSecret(),
 		},
 		Schema: map[string]*schema.Schema{
 			"tenant": {
