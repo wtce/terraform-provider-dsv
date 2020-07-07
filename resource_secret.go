@@ -132,6 +132,7 @@ func resourceSecret() *schema.Resource {
 				Description: "the path of the secret",
 				Required:    true,
 				Type:        schema.TypeString,
+				ForceNew:    true,
 			},
 			"version": {
 				Computed:    true,
